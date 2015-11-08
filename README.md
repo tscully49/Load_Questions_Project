@@ -14,9 +14,9 @@
 - Angular.js
 
 ## Workflow: 
-1) Host logs in first and has control over each round
-2) players will connect (google account)
-3) Host will start game which stops new players from joining
-4) A question will be asked, people will have a set time to answer (if they don't answer, they do not participate in the voting)
-5) After time is up, a new timer starts where people will make guesses on who answered what question
-6) At end of time, the answers will be shown, and points awarded accordingly, host will then choose when to start next round 
+1. Host logs in first and has control over each round
+2. players will connect (google account)
+3. Host will start game which stops new players from joining
+4. A question will be asked, people will have a set time to answer (if they don't answer, they do not participate in the voting)
+5. After time is up, a new timer starts where people will make guesses on who answered what question
+6. At end of time, the answers will be shown, and points awarded accordingly, host will then choose when to start next round 
