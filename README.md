@@ -12,6 +12,8 @@
 - socket.io
 - bower (package manager)
 - Angular.js
+- Bootstrap
+- Jquery
 
 ## Workflow: 
 1. Host logs in first and has control over each round
