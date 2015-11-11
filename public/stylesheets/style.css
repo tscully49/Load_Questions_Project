@@ -6,3 +6,20 @@ body {
 a {
   color: #00B7FF;
 }
+
+#timer-wrapper {
+	border: solid black 1px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	width: 7em;
+}
+
+#timer {
+	font-size: 24px;
+	text-align: center;
+}
+
+#timer-buttons button{
+	display: block-inline;
+	margin-right: 2em;
+}

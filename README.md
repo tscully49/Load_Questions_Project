@@ -11,7 +11,6 @@
 - jade (templating language)
 - socket.io
 - bower (package manager)
-- Angular.js
 - Bootstrap
 - Jquery
 

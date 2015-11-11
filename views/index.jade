@@ -1,5 +1,12 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1
+    u= title
+  //p Welcome to #{title}
+  #timer-buttons
+    button#start-timer Click to start timer
+    button#stop-timer Stop
+    button#reset-timer Reset
+  #timer-wrapper
+    #timer

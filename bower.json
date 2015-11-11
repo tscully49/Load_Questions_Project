@@ -1,0 +1,22 @@
+{
+  "name": "Loaded_Questions_Project",
+  "description": "",
+  "main": "",
+  "authors": [
+    "tscully49 <thomas1374@yahoo.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/tscully49/Loaded_Questions_Project",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5"
+  }
+}
