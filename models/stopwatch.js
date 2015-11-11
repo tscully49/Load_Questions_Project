@@ -7,10 +7,12 @@ function Stopwatch() {
 		return new Stopwatch();
 	}
 
+	console.log("WATCH CREATED");
+
 	this.hour = 3600000;
 	this.minute = 60000;
 	this.second = 1000;
-	this.time = this.hour;
+	this.time = this.minute; // make this available to be dynamic
 	this.interval = undefined;
 
 	events.EventEmitter.call(this);
@@ -36,7 +38,7 @@ Stopwatch.prototype.stop = function() {
 
 Stopwatch.prototype.reset = function() {
 	console.log('Reset timer');
-	this.time = this.hour;
+	this.time = this.hour; // make this dynamic??? MAKE A FUNCTION WHICH SETS TIMER LENGTH
 	this.emit('reset');
 };
 
@@ -47,18 +49,13 @@ Stopwatch.prototype.onTick = function() {
 		numSeconds,
 		output = "";
 
-	if (this.time === 0) {
-		this.stop();
-		return;
-	}
-
 	numHours = String(parseInt(remainder / this.hour, 10));
 	remainder -= this.hour * numHours;
 
 	numMinutes = String(parseInt(remainder / this.minute, 10));
 	remainder -= this.minute * numMinutes;
 
-	numSeconds = String(parseInt(remainder / this.second, 10 ));
+	numSeconds = String(parseInt(remainder / this.second, 10));
 
 	output = _.map([numHours, numMinutes, numSeconds], function(str) {
         if (str.length === 1) {
@@ -69,6 +66,11 @@ Stopwatch.prototype.onTick = function() {
 
     this.emit('tick', output);
     this.time -= this.second;
+
+    if (this.time === 0) {
+		this.stop();
+		return;
+	}
 }
 
 module.exports = Stopwatch;
