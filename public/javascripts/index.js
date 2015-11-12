@@ -21,13 +21,8 @@ $(document).ready(function() {
 	});
 
     // Starts the timer and show all of the answers with a drop down for each person to choose
-  socket.on('startVoting', function(answers, names) {
-    var answersList = [];
-    $.each(answers, function(key, value) {
-      answersList.push(value.answer);
-    });
-    //generateVotingChoices(answersList);
-    console.log(names);
+  socket.on('startVoting', function(answers, names) {    
+    $('#all-answers-for-voting').append(generatePoll(answers, names));
   });
   // end of socket listeners //
 
@@ -57,3 +52,15 @@ $(document).ready(function() {
     socket.emit('submittedAnswer', answer);
   });
 });
+
+function generatePoll(answers, names) {
+  var returnString = "";
+  $.each(answers, function(i, val) {
+    returnString = returnString + "<div id='answer-"+i+" form-group'><label for='option-"+i+"'><h4>"+val+"</h4></label><select class='form-control' id='option-"+i+"'>";
+    for (var j = 0; j < names.length; j++) {
+        returnString = returnString + "<option value='"+i+"-"+names[j]+"'>"+names[j]+"</option>";
+    }
+    returnString = returnString + "</select></div>";
+  });
+  return returnString;
+}

@@ -105,3 +105,12 @@ a {
   background-color: #9F9F9F;
   margin-bottom: 2em;
 }
+
+#answers-header h3 {
+  text-align: center;
+  font-weight: bold;
+}
+
+#answers-header {
+  border-bottom: solid grey 1px;
+}
