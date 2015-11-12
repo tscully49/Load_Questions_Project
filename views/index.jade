@@ -1,12 +1,40 @@
 extends layout
 
 block content
-  h1
-    u= title
-  //p Welcome to #{title}
-  #timer-buttons
-    button#start-timer Click to start timer
-    button#stop-timer Stop
-    button#reset-timer Reset
-  #timer-wrapper
-    #timer
+  .container
+    .row
+      .col-xs-12
+        h3#host-banner You are the host
+        #header-wrapper
+          h1
+            u= title
+        //p Welcome to #{title}
+        #timer-buttons
+          h3 Timer Controls
+          button#start-timer.btn.btn-success Click to start timer
+          button#stop-timer.btn.btn-danger Stop
+          button#reset-timer.btn.btn-info Reset
+        #timer-wrapper
+          #timer
+        #question-box-wrapper
+          #question-box-header 
+            u Current Question:
+          #question-box
+        form#answer-to-question-wrapper
+          .form-group
+            input#answer-box.form-control(type='text', name='sessionID', placeholder='answer' autocomplete='off')
+            button#submit-answer.btn.btn-primary Submit Answer
+        #show-answer.hidden
+          h3 Your Answer: 
+          h4#answer
+        #all-answers-for-voting
+          #answer1.form-group
+            label(for="select-users") h4 Test answer 1
+            select.form-control#select-users
+              option person1
+              option person2
+              option person3
+
+            
+
+

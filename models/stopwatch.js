@@ -67,7 +67,7 @@ Stopwatch.prototype.onTick = function() {
     this.emit('tick', output);
     this.time -= this.second;
 
-    if (this.time === 0) {
+    if (this.time < 0) {
 		this.stop();
 		return;
 	}
