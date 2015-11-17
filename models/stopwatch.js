@@ -1,6 +1,6 @@
 var util   = require('util'),
-	events = require('events'),
-	_      = require('underscore');
+		events = require('events'),
+		_      = require('underscore');
 
 function Stopwatch() {
 	if (false === (this instanceof Stopwatch)) {
@@ -17,7 +17,7 @@ function Stopwatch() {
 
 	events.EventEmitter.call(this);
 
-	_.bindAll(this, 'start', 'stop', 'reset', 'onTick');
+	_.bindAll(this, 'start', 'pause', 'reset', 'resume', 'onTick');
 };
 
 util.inherits(Stopwatch, events.EventEmitter);
@@ -26,19 +26,25 @@ Stopwatch.prototype.start = function() {
 	console.log("Starting the Timer!");
 	this.interval = setInterval(this.onTick, this.second);
 	this.emit('start');
+	this.onTick();
 };
 
-Stopwatch.prototype.stop = function() {
-	console.log('Stopping Timer');
+Stopwatch.prototype.pause = function() {
+	console.log('Pausing Timer');
 	if (this.interval) {
 		clearInterval(this.interval);
-		this.emit('stop');
+		this.emit('pause');
 	}
 };
 
-Stopwatch.prototype.reset = function() {
+Stopwatch.prototype.resume = function() {
+	console.log("Resumming timer");
+	this.interval = setInterval(this.onTick, this.second);
+};
+
+Stopwatch.prototype.reset = function(seconds) {
 	console.log('Reset timer');
-	this.time = this.hour; // make this dynamic??? MAKE A FUNCTION WHICH SETS TIMER LENGTH
+	this.time = seconds; // make this dynamic??? MAKE A FUNCTION WHICH SETS TIMER LENGTH
 	this.emit('reset');
 };
 
@@ -68,7 +74,8 @@ Stopwatch.prototype.onTick = function() {
     this.time -= this.second;
 
     if (this.time < 0) {
-		this.stop();
+			this.pause();
+			this.emit('endPhase');
 		return;
 	}
 }

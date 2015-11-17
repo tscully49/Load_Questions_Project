@@ -14,25 +14,26 @@ a {
 
 #timer-wrapper {
 	border: solid black 1px;
-	margin-top: 1em;
+	margin-top: -1px;
 	margin-bottom: 1em;
-	width: 7em;
 }
 
 #timer {
-	font-size: 24px;
+	font-size: 42px;
 	text-align: center;
+  line-height: 1em;
 }
 
 #timer-buttons button{
 	display: inline-block;
 	margin-right: 1.5em;
+  margin-top: 1em;
 }
 
 #timer-buttons {
   border: solid black 1px;
   padding: 1em;
-  width: 50%;
+  width: 100%;
 }
 
 #timer-buttons h3{
@@ -42,6 +43,11 @@ a {
 #question-box-wrapper {
 	margin-top: 2em;
 	font-size: 24px;
+  display: none;
+}
+
+#answer-to-question-wrapper {
+  display: none;
 }
 
 #question-box-header {
@@ -55,8 +61,16 @@ a {
 }
 
 .container {
-  background-color: #E9E9E9;
-  height: 100%;
+  background-color: #F8F6F6;
+}
+
+#app-wrapper {
+  min-height: 100%;
+  padding-bottom: 5em;
+}
+
+::-webkit-scrollbar { 
+    display: none; 
 }
 
 #submit-answer {
@@ -68,8 +82,11 @@ a {
   background-color: #60E0ED;
   padding-top: 0.25em;
   padding-bottom: 0.25em;
+  margin-left: -15px;
+  margin-right: -15px;
   text-align: center;
-  width: 100%;
+  width: auto;
+  margin-bottom: 0;
 }
 
 #show-answer h3, #show-answer #answer {
@@ -96,14 +113,19 @@ a {
 }
 
 #header-wrapper {
-  width: 100%;
+  margin-left: -15px;
+  margin-right: -15px;
   height: 6em;
   text-align: center;
-  border-radius: 25px;
   border: solid 1px #9F9F9F;
   color: white;
   background-color: #9F9F9F;
   margin-bottom: 2em;
+}
+
+#header-wrapper h1 {
+  margin-right: -15px;
+  margin-left: -15px;
 }
 
 #answers-header h3 {
@@ -113,4 +135,18 @@ a {
 
 #answers-header {
   border-bottom: solid grey 1px;
+}
+
+#all-answers-for-voting {
+  margin-top: 4em;
+}
+
+/* Hidden placeholder */
+select option[disabled]:first-child {
+  display: none;
+}
+
+#timer-buttons #end-round {
+  float: right;
+  margin-right: 0;
 }

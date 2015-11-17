@@ -3,80 +3,121 @@ var stopwatch = Stopwatch();
 var people = {};
 var answers = {};
 var question;
+var personCount = 0;
+var state = "pregame"; // Options: pregame, answering, bufferTime, voting, calculating, endgame
 // Make a status variable that will not allow people to join the game AFTER answers are submitted or if people haven't answered a question
 
 module.exports = function (io) {
-
 	io.on('connection', function (socket) {
-	    question = "What is your favorite animal?";
-	    socket.emit('currentQuestion', question);
-
 	    //socket.on('join', function () {
 	    	if (Object.keys(people).length === 0) {
-	    		console.log('host joined');
-	    		people[socket.id] = {"name": "host", "image": "fake picture", "host": true};
+          personCount++;
+          console.log("host-"+personCount+" joined");
+	    		people[socket.id] = {"name": "host-"+personCount, "image": "fake picture", "host": true};
 	    	  socket.emit('isHost');
         } else {
-	    		console.log("Someone else joined");
-	    		people[socket.id] = {"name": "person", "image": "other picture", "host": false};
+          personCount++;
+          console.log("person-"+personCount+" joined");
+	    		people[socket.id] = {"name": "person-"+personCount, "image": "other picture", "host": false};
 	    	}
-	    	//console.log(people);
+        socket.emit('connected');
 	    //});
 
       // this will start the voting process
-	    socket.on('startTimer', function() {
-	    	var names = [];
-        var answersList = [];
-        
-        for(var key in answers) {
-          answersList.push(answers[key].answer);
-        }
+	    socket.on('startRound', function() {
+        startRound();
+      });
 
-        // Gather a list of everyone's names
-        for(var key in people) {
-          names.push(people[key].name);
-        }
-
-        io.emit('startVoting', answersList, names);
-        stopwatch.start();
-        console.log(answers);
+	    socket.on('pauseTimer', function() {
+	    	stopwatch.pause();
 	    });
 
-	    socket.on('stopTimer', function() {
-	    	stopwatch.stop();
+	    socket.on('resetTimer', function(seconds) {
+	    	stopwatch.reset(seconds);
 	    });
 
-	    socket.on('resetTimer', function() {
-	    	stopwatch.reset();
-	    });
+      socket.on('resumeTimer', function() {
+        stopwatch.resume();
+      });
+
+      socket.on('cancelRound', function() {
+        io.emit('endRound');
+      });
 
 	    socket.on('disconnect', function() {
 	    	delete people[socket.id];
         delete answers[socket.id];
         // if people are voting, change the answers to remove that person's answer
-	    	//console.log("someone left");
-	    	//console.log(people);
 	    });
 
       // A user submits an answer to a question
       socket.on('submittedAnswer', function(answer) {
-        answers[socket.id] = {'user': socket.id, 'name': people[socket.id].name, 'answer': answer};
+        answers[socket.id] = {'id': socket.id, 'name': people[socket.id].name, 'answer': answer};
       });
-
-	    // Stopwatch logic 
-	    stopwatch.on('tick', function(time) {
-	    	console.log(socket.id + '---stopwatch tick!' + time);
-	    	socket.emit('timer', { countdown: time });
-	    });
 	});
+
+  // All other listeners are not within the CONNECTION listener
+
+  stopwatch.on('tick', function(time) {
+    console.log('stopwatch tick!' + time);
+    io.emit('timer', { countdown: time });
+  });
+
+  stopwatch.on('endPhase', function() {
+    if (state == "answering") {
+      var names = [];
+      var answersList = [];
+
+      state = "voting";
+      io.emit('endQuestion');
+
+      // Start voting on the answers 
+      for(var key in answers) {
+        answersList.push(answers[key].answer);
+      }
+
+      for(var key in people) {
+        names.push(people[key].name);
+      }
+      console.log(answersList);
+
+      io.emit('startVoting', answersList, names);
+      stopwatch.reset(5000); // reset to two minutes
+      stopwatch.start();
+      return;
+    }
+
+    if (state == "voting") {
+      console.log('this worked');
+      io.emit('endVoting');
+      // Show a loading... screen until the votes are tallied
+      // Tally up votes
+      return; 
+    }
+  });
+
+  function startRound() {
+    state = "answering";
+    
+    // Start answering the question 
+    question = "What is your favorite animal?";
+    io.emit('startQuestion', question);
+    stopwatch.reset(10000); // reset stopwatch to one minute
+    stopwatch.start(); // Start for one minute
+  }
 };
 
-function makeid() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+function calculateVotes() {
 
-    for( var i=0; i < 5; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
 }
+
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for( var i=0; i < 5; i++ )
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+

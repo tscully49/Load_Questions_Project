@@ -1,19 +1,21 @@
 extends layout
 
 block content
-  .container
+  .container#app-wrapper
     .row
-      .col-xs-12
+      .col-xs-12#game-wrapper
         h3#host-banner You are the host
         #header-wrapper
           h1
             u= title
         //p Welcome to #{title}
         #timer-buttons
-          h3 Timer Controls
-          button#start-timer.btn.btn-success Click to start timer
-          button#stop-timer.btn.btn-danger Stop
-          button#reset-timer.btn.btn-info Reset
+          h3 Master Controls
+          button#start-round.btn.btn-success Click to start round
+          button#resume-timer.btn.btn-success.hidden Resume Timer
+          button#pause-timer.btn.btn-warning.hidden Pause Timer
+          button#reset-timer.btn.btn-info.hidden Reset Timer?
+          button#end-round.btn.btn-danger.hidden End Round
         #timer-wrapper
           #timer
         #question-box-wrapper
@@ -27,6 +29,7 @@ block content
         #show-answer.hidden
           h3 Your Answer: 
           h4#answer
-        #all-answers-for-voting
+        #all-answers-for-voting.hidden
           #answers-header 
             h3 Vote on who gave each answer!!!
+        #server-disconnect
