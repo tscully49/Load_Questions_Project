@@ -42,7 +42,7 @@ $(document).ready(function() {
     // loading screen
   });
 
-  socket.on('endRound')
+  //socket.on('endRound')
 
   socket.on('disconnect', function() {
     $('#answer-to-question-wrapper').hide();
@@ -94,15 +94,12 @@ $(document).ready(function() {
 	});
 
   $('#end-round').click(function() {
-    if (confirm("Do you want to do this? (this doesn't work yet)")) {
-      socket.emit('cancelRound');
-      $('#end-round').addClass('hidden');
-      $('#resume-timer').addClass('hidden');
-      $('#start-round').removeClass('hidden');
-      $('#pause-timer').addClass('hidden');
-      $('#reset-timer').addClass('hidden');
-    }
-  });
+    var prompt = "Are you sure?"
+        buttons = "<div id='cancel-buttons'><p class='confirm-prompt'><b>Are you sure?</b></p><button id='no-cancel' class='btn btn-default'>no</button><button id='yes-cancel' class='btn btn-default'>yes</button></div>";
+
+        $('#end-round').hide();
+        $('#end-round-wrapper').append(buttons);
+  }, confirmRoundCancel());
 
   ////////////////////////////////////////////////////
   //////// END of button listeners to sockets ///////////////////////////////////////
@@ -121,7 +118,9 @@ $(document).ready(function() {
   });
 });
 
-
+// FUNCTION: generatePoll(arg[0], arg[1])
+// arg[0] = an array of all answers
+// arg[1] = an array of all names of players
 function generatePoll(answers, names) {
   var returnString = "";
   $.each(answers, function(i, val) {
@@ -133,4 +132,18 @@ function generatePoll(answers, names) {
   });
   if (returnString == "") {return "No one answered the question..."};
   return returnString;
+}
+
+function confirmRoundCancel() {
+  $(document).on('click', '#yes-cancel', function() {
+    socket.emit('cancelRound');
+    $('#end-round, #resume-timer, #pause-timer, #reset-timer').addClass('hidden');
+    $('#start-round').removeClass('hidden');
+    $('#yes-cancel, #no-cancel, .confirm-prompt').remove();
+  });
+
+  $(document).on('click', '#no-cancel', function() {
+    $('#end-round').show();
+    $('#yes-cancel, #no-cancel, .confirm-prompt').remove();
+  });
 }

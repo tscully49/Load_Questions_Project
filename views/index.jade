@@ -9,13 +9,15 @@ block content
           h1
             u= title
         //p Welcome to #{title}
-        #timer-buttons
-          h3 Master Controls
-          button#start-round.btn.btn-success Click to start round
-          button#resume-timer.btn.btn-success.hidden Resume Timer
-          button#pause-timer.btn.btn-warning.hidden Pause Timer
-          button#reset-timer.btn.btn-info.hidden Reset Timer?
-          button#end-round.btn.btn-danger.hidden End Round
+        #timer-buttons.group
+          #buttons-wrapper
+            h3 Master Controls
+            button#start-round.btn.btn-success Click to start round
+            button#resume-timer.btn.btn-success.hidden Resume Timer
+            button#pause-timer.btn.btn-warning.hidden Pause Timer
+            button#reset-timer.btn.btn-info.hidden Reset Timer?
+          #end-round-wrapper
+            button#end-round.btn.btn-danger.hidden End Round
         #timer-wrapper
           #timer
         #question-box-wrapper

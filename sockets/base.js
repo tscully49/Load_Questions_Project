@@ -41,7 +41,12 @@ module.exports = function (io) {
       });
 
       socket.on('cancelRound', function() {
-        io.emit('endRound');
+        // empty answers array and names array
+        // emit to all users a resetRound event
+        // Change state back to pregame
+        // emit a different event to the host??? Or check client side
+        // Stop the current timer AND reset to the pregame time --- do you need to???
+        stopwatch.pause();
       });
 
 	    socket.on('disconnect', function() {
@@ -79,7 +84,6 @@ module.exports = function (io) {
       for(var key in people) {
         names.push(people[key].name);
       }
-      console.log(answersList);
 
       io.emit('startVoting', answersList, names);
       stopwatch.reset(5000); // reset to two minutes
@@ -103,12 +107,12 @@ module.exports = function (io) {
     question = "What is your favorite animal?";
     io.emit('startQuestion', question);
     stopwatch.reset(10000); // reset stopwatch to one minute
-    stopwatch.start(); // Start for one minute
+    stopwatch.start();
   }
 };
 
 function calculateVotes() {
-
+  // add up the votes and print out scores, and the rankings
 }
 
 function makeid() {

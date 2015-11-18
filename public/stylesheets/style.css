@@ -34,6 +34,8 @@ a {
   border: solid black 1px;
   padding: 1em;
   width: 100%;
+  box-sizing: border-box;
+  position: relative;
 }
 
 #timer-buttons h3{
@@ -61,7 +63,7 @@ a {
 }
 
 .container {
-  background-color: #F8F6F6;
+  background-color: #EAEAEA;
 }
 
 #app-wrapper {
@@ -117,7 +119,7 @@ a {
   margin-right: -15px;
   height: 6em;
   text-align: center;
-  border: solid 1px #9F9F9F;
+  border: solid 1px #878787;
   color: white;
   background-color: #9F9F9F;
   margin-bottom: 2em;
@@ -148,5 +150,53 @@ select option[disabled]:first-child {
 
 #timer-buttons #end-round {
   float: right;
-  margin-right: 0;
+  margin-right: 1em;
+  bottom: 0;
+  position: absolute;
+  right: 0;
+  margin-bottom: 1em
+}
+
+#cancel-buttons #yes-cancel, #cancel-buttons #no-cancel {
+  margin-right: 1.3em;
+  margin-bottom: 1em;
+  float: right;
+
+}
+
+#yes-cancel {
+  margin-left: 1em;
+}
+
+.confirm-prompt {
+  margin-bottom: 0;
+  text-align: center;
+  margin-bottom: -0.25em;
+}
+
+#cancel-buttons {
+  float: right;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+#buttons-wrapper {
+  width: 80%;
+  float: left;
+}
+
+#end-round-wrapper {
+  width: 20%;
+  float: right;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+}
+
+.group {
+  content: "";
+  display: table;
+  clear: both;
 }
