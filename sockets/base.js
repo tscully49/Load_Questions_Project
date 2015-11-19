@@ -4,7 +4,7 @@ var people = {};
 var answers = {};
 var question;
 var personCount = 0;
-var state = "pregame"; // Options: pregame, answering, bufferTime, voting, calculating, endgame
+var state = 'pregame'; // Options: pregame, answering, bufferTime, voting, calculating, endgame
 // Make a status variable that will not allow people to join the game AFTER answers are submitted or if people haven't answered a question
 
 module.exports = function (io) {
@@ -41,11 +41,17 @@ module.exports = function (io) {
       });
 
       socket.on('cancelRound', function() {
-        // empty answers array and names array
-        // emit to all users a resetRound event
+        // empty answers object
+        for (var prop in answers) {
+          if (answers.hasOwnProperty(prop)) {
+            delete answers[prop];
+          }
+        }
+        // emit to all users a resetRound event (reset clock, hide questions, answers, and their answers)
+        io.emit('resetRound');
         // Change state back to pregame
+        state = 'pregame';
         // emit a different event to the host??? Or check client side
-        // Stop the current timer AND reset to the pregame time --- do you need to???
         stopwatch.pause();
       });
 
@@ -57,7 +63,7 @@ module.exports = function (io) {
 
       // A user submits an answer to a question
       socket.on('submittedAnswer', function(answer) {
-        answers[socket.id] = {'id': socket.id, 'name': people[socket.id].name, 'answer': answer};
+        answers[socket.id] = {'name_id': makeid(), 'name': people[socket.id].name, 'answer': answer};
       });
 	});
 
@@ -70,22 +76,20 @@ module.exports = function (io) {
 
   stopwatch.on('endPhase', function() {
     if (state == "answering") {
-      var names = [];
-      var answersList = [];
+      var names = {};
+      var answersObject = {};
 
       state = "voting";
       io.emit('endQuestion');
 
       // Start voting on the answers 
       for(var key in answers) {
-        answersList.push(answers[key].answer);
+        names[key] = answers[key].name;
+        answersObject[answers[key].name_id] = answers[key].answer;
       }
+      console.log(answersObject); 
 
-      for(var key in people) {
-        names.push(people[key].name);
-      }
-
-      io.emit('startVoting', answersList, names);
+      io.emit('startVoting', answersObject, names);
       stopwatch.reset(5000); // reset to two minutes
       stopwatch.start();
       return;

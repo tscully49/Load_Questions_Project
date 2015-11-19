@@ -45,11 +45,6 @@ a {
 #question-box-wrapper {
 	margin-top: 2em;
 	font-size: 24px;
-  display: none;
-}
-
-#answer-to-question-wrapper {
-  display: none;
 }
 
 #question-box-header {
