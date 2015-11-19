@@ -7,6 +7,36 @@ var personCount = 0;
 var state = "pregame"; // Options: pregame, answering, bufferTime, voting, calculating, endgame
 // Make a status variable that will not allow people to join the game AFTER answers are submitted or if people haven't answered a question
 
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
+var collectionName = 'demo';
+var mongo = function(db, callback) {
+        MongoClient.connect('mongodb://loadedquestionsdb.cloudapp.net:27017/' + db, callback);
+};
+
+function queryData(startRound){
+  mongo('demo', function(err, db) {
+  				if (err){
+  					 console.log("Connection Error", err);
+  					 return "Database connection error.";
+  				 }
+
+  				var collection = db.collection('questions');
+
+  				var query = {};
+  				collection.find(query).toArray(function(err, items) {
+  								if (err) respond(res, {"Query Error": err});
+  								var index = Math.floor(Math.random() * 25);
+  								var question = items[index];
+  								db.close();
+									var questionText = question.questionText;
+									console.log(JSON.stringify(questionText));
+  								startRound(questionText);
+  				});
+  });
+};
+
+
 module.exports = function (io) {
 	io.on('connection', function (socket) {
 	    //socket.on('join', function () {
@@ -25,8 +55,8 @@ module.exports = function (io) {
 
       // this will start the voting process
 	    socket.on('startRound', function() {
-        startRound();
-      });
+				queryData(startRound);
+			});
 
 	    socket.on('pauseTimer', function() {
 	    	stopwatch.pause();
@@ -76,7 +106,7 @@ module.exports = function (io) {
       state = "voting";
       io.emit('endQuestion');
 
-      // Start voting on the answers 
+      // Start voting on the answers
       for(var key in answers) {
         answersList.push(answers[key].answer);
       }
@@ -96,15 +126,16 @@ module.exports = function (io) {
       io.emit('endVoting');
       // Show a loading... screen until the votes are tallied
       // Tally up votes
-      return; 
+      return;
     }
   });
 
-  function startRound() {
+  function startRound(questionText) {
     state = "answering";
-    
-    // Start answering the question 
-    question = "What is your favorite animal?";
+
+    // Start answering the question
+    question = questionText;
+		console.log(question);
     io.emit('startQuestion', question);
     stopwatch.reset(10000); // reset stopwatch to one minute
     stopwatch.start();
@@ -124,4 +155,3 @@ function makeid() {
 
   return text;
 }
-
