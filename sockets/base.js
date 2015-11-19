@@ -96,7 +96,7 @@ module.exports = function (io) {
     }
 
     if (state == "voting") {
-      console.log('this worked');
+      state = "calculating";
       io.emit('endVoting');
       // Show a loading... screen until the votes are tallied
       // Tally up votes
