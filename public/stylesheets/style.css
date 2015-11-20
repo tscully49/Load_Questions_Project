@@ -135,7 +135,7 @@ a {
 }
 
 #all-answers-for-voting {
-  margin-top: 4em;
+  margin-top: 3em;
 }
 
 /* Hidden placeholder */
@@ -194,4 +194,12 @@ select option[disabled]:first-child {
   content: "";
   display: table;
   clear: both;
+}
+
+#score .panel {
+  margin-bottom: 0;
+}
+
+#current-score {
+  border: solid black 1px;
 }
