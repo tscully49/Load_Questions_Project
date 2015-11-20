@@ -18,10 +18,13 @@ $(document).ready(function() {
   socket.on('isHost', function() {
     $('#timer-buttons').show();
     $('#host-banner').show();
+    isHost = true;
   })
 
 	socket.on('startQuestion', function(question) {
     $('#alert-end-round').remove();
+    $('#current-score').addClass('hidden');
+    $('#score').empty();
     $('#answer-to-question-wrapper').removeClass('hidden');
     $('#question-box-wrapper').removeClass('hidden');
 		$('#question-box').html(question);
@@ -39,22 +42,33 @@ $(document).ready(function() {
   });
 
   socket.on('endVoting', function() {
-    $('#all-answers-for-voting').after().empty().addClass('hidden');
+    var returnArray = {};
     // loading screen
+    $('.select-people').each(function() {
+      returnArray[$(this).attr('id')] = $(this).val();
+    });
+    $('#answers-header').nextAll().remove();
+    $('#all-answers-for-voting').addClass('hidden')
+    // Display results after????
+    socket.emit('sendVotes', returnArray);
   });
 
-  socket.on('resetRound', function() {
+  socket.on('resetRound', function(text) {
     var endRoundAlert = $("<div id='alert-end-round' class='alert alert-danger alert-dismissible fade in' role='alert'>"+
                         "<button type='button' class='close' data-dismiss='alert' aria-label="+
                         "'Close'><span aria-hidden='true'>&times;</span>"+
-                        "</button>Round was Cancelled, restarting soon...</div>").hide().fadeIn();
+                        "</button>"+text+"</div>").hide().fadeIn();
     refreshRound();
     //Create a warning box saying that the round was cancelled ssff
     $('#alert-end-round').remove();
     $('#game-wrapper').append(endRoundAlert);
   });
 
-  //socket.on('endRound')
+  socket.on('roundOver', function(scores) {
+    $('#current-score').removeClass('hidden');
+    $('#score').empty().append(showScores(scores));
+    refreshRound();
+  });
 
   socket.on('disconnect', function() {
     var disconnectAlert = $("<div id='alert-end-round' class='alert alert-danger alert-dismissible fade in' role='alert'>"+
@@ -118,7 +132,7 @@ $(document).ready(function() {
     $('#answer-box').val('');
     event.preventDefault();
     
-    $('#answer-to-question-wrapper').removeClass('hidden');
+    $('#answer-to-question-wrapper').addClass('hidden');
     $('#show-answer').removeClass('hidden');
     $('#answer').text(answer);
 
@@ -132,9 +146,9 @@ $(document).ready(function() {
 function generatePoll(answers, names) {
   var returnString = "";
   $.each(answers, function(i, val) {
-    returnString = returnString + "<div id='answer-"+i+" form-group'><label for='option-"+i+"'><h4>"+val+"</h4></label><select class='form-control' id='option-"+i+"'><option disabled selected value=''>select a user</option>";
+    returnString = returnString + "<div id='answer-"+i+" form-group'><label for='"+i+"'><h4>"+val+"</h4></label><select class='form-control select-people' id='"+i+"'><option disabled selected value=''>select a user</option>";
     $.each(names, function(socket, name) {
-        returnString = returnString + "<option value='"+socket+"-"+name+"'>"+name+"</option>";
+        returnString = returnString + "<option value='"+socket+"'>"+name+"</option>";
     });
     returnString = returnString + "</select></div>";
   });
@@ -145,9 +159,6 @@ function generatePoll(answers, names) {
 function confirmRoundCancel() {
   $(document).on('click', '#yes-cancel', function() {
     socket.emit('cancelRound');
-    $('#end-round, #resume-timer, #pause-timer, #reset-timer').addClass('hidden');
-    $('#resume-timer, #pause-timer').prop('disabled', '');
-    $('#start-round').removeClass('hidden');
     $('#yes-cancel, #no-cancel, .confirm-prompt').remove();
   });
 
@@ -165,8 +176,28 @@ function refreshRound() {
   $('#answer-to-question-wrapper').addClass('hidden');
   $('#question-box-wrapper').addClass('hidden');
   //remove answers
-  $('#all-answers-for-voting').empty().addClass('hidden');
+  $('#all-answers-for-voting').addClass('hidden');
+  $('#answers-header').nextAll().remove();
   //remove own answer
   $('#show-answer').addClass('hidden');
   $('#answer').empty();
+  if (isHost) {
+    $('#end-round, #resume-timer, #pause-timer, #reset-timer').addClass('hidden');
+    $('#resume-timer, #pause-timer').prop('disabled', '');
+    $('#start-round').removeClass('hidden');
+  }
+}
+
+function showScores(array) {
+  var returnString = "";
+  returnString = returnString + "<div class='panel panel-default'><div class='panel-heading'><b>Scores</b></div><table class='table'>"+
+                    "<thead><tr><th>#</th><th>Name</th><th>Score</th></tr></thead><tbody>";
+
+  $.each(array, function(i, person) {
+    returnString = returnString + "<tr><th scope='row'>"+(i+1)+"</th><td>"+person.name+"</td><td>"+person.score+"</td></tr>";
+  });
+
+  returnString = returnString + "</tbody></table></div>";
+  console.log(returnString);
+  return returnString;
 }
