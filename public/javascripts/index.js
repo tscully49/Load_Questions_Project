@@ -2,28 +2,49 @@ var socket;
 var isHost = false;
 
 $(document).ready(function() {
-	socket = io();
-  // DO THIS ON A CONNECTION $('#server-disconnect').remove();
+	$('#game-wrapper').hide();
+  $('#signIn').show();
+});
+
+//GoogleAuthentication API Functions
+function onSignIn(googleUser) {
+  var profile      = googleUser.getBasicProfile(),
+      user_profile = { "name": profile.getName(), "image": profile.getImageUrl(), "email": profile.getEmail() }
+  //console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+  console.log('Name: ' + profile.getName());
+  console.log('Image URL: ' + profile.getImageUrl());
+  console.log('Email: ' + profile.getEmail());
+  
+  socket = io();
+
+  if (profile.getName() != "") {
+    socket.emit("join", user_profile);
+    //$("#login").detach();
+    $("#signIn").hide();
+    $("#game-wrapper").show();
+  }
 
   ///////////////////////////////////////////////////////////////////
   //////////////////////// Socket listeners ////////////////////////////////
   ///////////////////////////////////////////////////////////////////
 
-	socket.on('timer', function (data) {
-		$('#timer').html(data.countdown);
-	});
+  socket.on('timer', function (data) {
+    $('#timer').html(data.countdown);
+  });
 
-  socket.on('isHost', function(hostButtons, hostBanner) {
+  socket.on('isHost', function(hostButtons, hostBanner, name) {
     $('#timer-buttons').empty().append(hostButtons).removeClass('hidden');
     $('#host-banner-wrapper').empty().append(hostBanner);
     $('#server-disconnect').empty();
+    $('#name').empty().append(name);
     isHost = true;
   });
 
-  socket.on('isNotHost', function() {
+  socket.on('isNotHost', function(name) {
     $('#timer-buttons').empty().addClass('hidden');
     $('#host-banner').remove();
     $('#server-disconnect').empty();
+    $('#name').empty().append(name);
     isHost = false;
   });
 
@@ -35,14 +56,14 @@ $(document).ready(function() {
     $('#phase').empty().append(state);
   });
 
-	socket.on('startQuestion', function(question) {
+  socket.on('startQuestion', function(question) {
     $('#alert-end-round').remove();
     $('#current-score').addClass('hidden');
     $('#score').empty();
     $('#answer-to-question-wrapper').removeClass('hidden');
     $('#question-box-wrapper').removeClass('hidden');
-		$('#question-box').html(question);
-	});
+    $('#question-box').html(question);
+  });
 
   socket.on('endQuestion', function() {
     $('#answer-to-question-wrapper').addClass('hidden');
@@ -104,20 +125,20 @@ $(document).ready(function() {
   //// START Button event listeners that will emit to sockets ///////////////////
   /////////////////////////////////////////////////////////////////
 
-	$(document).on('click', '#start-round', function() {
-		socket.emit('startRound');
+  $(document).on('click', '#start-round', function() {
+    socket.emit('startRound');
     $(event.target).addClass('hidden');
     $('#resume-timer').removeClass('hidden').prop('disabled', true);
     $('#end-round').removeClass('hidden');
     $('#pause-timer').removeClass('hidden');
     $('#reset-timer').removeClass('hidden');
-	});
+  });
 
-	$(document).on('click', '#pause-timer', function() {
+  $(document).on('click', '#pause-timer', function() {
     $(event.target).prop('disabled', true);
     $('#resume-timer').prop('disabled', '');
-		socket.emit('pauseTimer');
-	});
+    socket.emit('pauseTimer');
+  });
 
   $(document).on('click', '#resume-timer', function() {
     $(event.target).prop('disabled', true);
@@ -125,10 +146,10 @@ $(document).ready(function() {
     socket.emit('resumeTimer');
   });
 
-	$(document).on('click', '#reset-timer', function() {
+  $(document).on('click', '#reset-timer', function() {
     var seconds = 60000;
-		socket.emit('resetTimer', 60000);
-	});
+    socket.emit('resetTimer', 60000);
+  });
 
   $(document).on('click', '#end-round', function() {
     var prompt = "Are you sure?"
@@ -153,16 +174,7 @@ $(document).ready(function() {
 
     socket.emit('submittedAnswer', answer);
   });
-});
 
-//GoogleAuthentication API Functions
-function onSignIn(googleUser) {
-  var profile = googleUser.getBasicProfile();
-  //console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  console.log('Name: ' + profile.getName());
-  console.log('Image URL: ' + profile.getImageUrl());
-  console.log('Email: ' + profile.getEmail());
-  
   /*var id_token = googleUser.getAuthResponse().id_token;
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'http://yourbackend.example.com/tokensignin');
@@ -233,3 +245,12 @@ function showScores(array) {
   returnString = returnString + "</tbody></table></div>";
   return returnString;
 }
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    $('#game-wrapper').hide();
+    $('#signIn').show();
+    location.reload(window.location.href)
+  });
+} 

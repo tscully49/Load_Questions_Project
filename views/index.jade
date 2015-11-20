@@ -3,20 +3,14 @@ extends layout
 block content
   .container#app-wrapper
     .row
+      .col-xs-6.col-xs-offset-3#signIn
+        #sign-in-wrapper
+          .g-signin2(data-onsuccess='onSignIn')
       .col-xs-12#game-wrapper
         #host-banner-wrapper
         #header-wrapper
           h1
             u= title
-        .g-signin2(data-onsuccess='onSignIn')
-        a(href='#', onclick='signOut();') Sign out
-        script.
-          function signOut() {
-          var auth2 = gapi.auth2.getAuthInstance();
-          auth2.signOut().then(function () {
-          console.log('User signed out.');
-          });
-          }	
         //p Welcome to #{title}
         #round
           #number-wrapper
@@ -45,3 +39,9 @@ block content
             h3 Vote on who gave each answer!!!
         #current-score.hidden
           #score
+        #signed-in-as
+          #username
+            h4 Signed in as:
+            h5#name
+          a#sign-out(href='#', onclick='signOut();') Sign out
+

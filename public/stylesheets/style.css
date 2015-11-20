@@ -64,7 +64,16 @@ a {
 
 #app-wrapper {
   min-height: 100%;
-  padding-bottom: 5em;
+  padding-bottom: 2em;
+}
+
+#app-wrapper .row {
+  min-height: inherit;
+}
+
+
+#app-wrapper .row #game-wrapper {
+  min-height: inherit;
 }
 
 ::-webkit-scrollbar { 
@@ -235,4 +244,34 @@ select option[disabled]:first-child {
 
 #stage > h4 {
   font-size: 20px;
+}
+
+.g-signin2 {
+  display: inline-block;
+  margin-top: 3em;
+}
+
+#sign-in-wrapper {
+  text-align: center;
+}
+
+#sign-out {
+  float: right;
+  clear: both;
+}
+
+#username {
+  float: left;
+}
+
+#name, #username h4 {
+  display: inline-block;
+}
+
+#name {
+  margin-left: 1em;
+}
+
+#sign-in-as {
+  margin-top: 3em;
 }

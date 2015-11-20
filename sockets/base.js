@@ -63,17 +63,17 @@ function queryData(startRound){
 
 module.exports = function (io) {
 	io.on('connection', function (socket) {
-    //socket.on('join', function () {
+    socket.on('join', function (profile) {
     	if (Object.keys(people).length === 0) {
         personCount++;
         console.log("host-"+personCount+" joined");
-    		people[socket.id] = {"name": "thishost-"+personCount, "image": "fake picture", "host": true, "score": 0};
-    	  socket.emit('isHost', hostButtons, hostBanner);
+    		people[socket.id] = {"name": profile.name, "image": profile.image, "email": profile.email, "host": true, "score": 0};
+    	  socket.emit('isHost', hostButtons, hostBanner, profile.name);
       } else {
         personCount++;
         console.log("person-"+personCount+" joined");
-    		people[socket.id] = {"name": "a-person-"+personCount, "image": "other picture", "host": false, "score": 0};
-    	  socket.emit('isNotHost');
+    		people[socket.id] = {"name": profile.name, "image": profile.image, "email": profile.email, "host": false, "score": 0};
+    	  socket.emit('isNotHost', profile.name);
       }
       socket.emit('updateRound', round);
       socket.emit('updateState', state);
@@ -83,7 +83,7 @@ module.exports = function (io) {
       } else {
         people[socket.id].isPlaying = false;
       }
-    //});
+    });
 
     // this will start the User Voting process
     socket.on('startRound', function() {
