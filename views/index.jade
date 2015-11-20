@@ -8,6 +8,15 @@ block content
         #header-wrapper
           h1
             u= title
+        .g-signin2(data-onsuccess='onSignIn')
+        a(href='#', onclick='signOut();') Sign out
+        script.
+          function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut().then(function () {
+          console.log('User signed out.');
+          });
+          }	
         //p Welcome to #{title}
         #round
           #number-wrapper
