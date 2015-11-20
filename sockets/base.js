@@ -3,9 +3,29 @@ var stopwatch = Stopwatch();
 var people = {};
 var answers = {};
 var allVotes = {};
+var players = Array();
 var question;
 var personCount = 0;
-var state = 'pregame'; // Options: pregame, answering, bufferTime, voting, calculating, endgame
+var round = 1;
+var state = 'Pregame'; // Options: Pregame, User Answers, bufferTime, User Voting, calculating, endgame
+var hostButtons = "<div id='buttons-wrapper'><h3>Master Control</h3><button id='start-round' class='btn btn-success'>Click to start round</button>"+
+                  "<button id='resume-timer' class='btn btn-success hidden'>Resume Timer</button>"+
+                  "<button id='pause-timer' class='btn btn-warning hidden'>Pause Timer</button>"+
+                  "<button id='reset-timer' class='btn btn-info hidden'>Reset Timer</button>"+
+                  "</div><div id='end-round-wrapper'><button id='end-round' class='btn btn-danger hidden'>Reset Timer?</button></div>";
+var hostBanner = "<h3 id='host-banner'>You are the host</h3>";
+
+/*
+h3#host-banner You are the host
+#buttons-wrapper
+  h3 Master Controls
+  button#start-round.btn.btn-success Click to start round
+  button#resume-timer.btn.btn-success.hidden Resume Timer
+  button#pause-timer.btn.btn-warning.hidden Pause Timer
+  button#reset-timer.btn.btn-info.hidden Reset Timer?
+#end-round-wrapper
+  button#end-round.btn.btn-danger.hidden End Round
+*/
 // Make a status variable that will not allow people to join the game AFTER answers are submitted or if people haven't answered a question
 
 
@@ -47,17 +67,25 @@ module.exports = function (io) {
     	if (Object.keys(people).length === 0) {
         personCount++;
         console.log("host-"+personCount+" joined");
-    		people[socket.id] = {"name": "host-"+personCount, "image": "fake picture", "host": true, "score": 0};
-    	  socket.emit('isHost');
+    		people[socket.id] = {"name": "thishost-"+personCount, "image": "fake picture", "host": true, "score": 0};
+    	  socket.emit('isHost', hostButtons, hostBanner);
       } else {
         personCount++;
         console.log("person-"+personCount+" joined");
-    		people[socket.id] = {"name": "person-"+personCount, "image": "other picture", "host": false, "score": 0};
-    	}
-      socket.emit('connected');
+    		people[socket.id] = {"name": "a-person-"+personCount, "image": "other picture", "host": false, "score": 0};
+    	  socket.emit('isNotHost');
+      }
+      socket.emit('updateRound', round);
+      socket.emit('updateState', state);
+
+      if (state === 'Pregame') {
+        people[socket.id].isPlaying = true;
+      } else {
+        people[socket.id].isPlaying = false;
+      }
     //});
 
-    // this will start the voting process
+    // this will start the User Voting process
     socket.on('startRound', function() {
 			queryData(startRound);
 		});
@@ -81,7 +109,7 @@ module.exports = function (io) {
     socket.on('disconnect', function() {
     	delete people[socket.id];
       delete answers[socket.id];
-      // if people are voting, change the answers to remove that person's answer
+      // if people are User Voting, change the answers to remove that person's answer
     });
 
     // A user submits an answer to a question
@@ -108,17 +136,20 @@ module.exports = function (io) {
   });
 
   stopwatch.on('endPhase', function() {
-    if (state == "answering") {
+    if (state == "User Answers") {
       var names = {};
       var answersObject = {};
 
-      state = "voting";
+      state = 'User Voting';
+      io.emit('updateState', state);
       io.emit('endQuestion');
 
-      // Start voting on the answers
+      // Start User Voting on the answers
       for(var key in answers) {
-        names[key] = answers[key].name;
         answersObject[answers[key].name_id] = answers[key].answer;
+      }
+      for(var key in people) {
+        names[key] = people[key].name;
       }
 
       if (Object.keys(answers).length === 0) {
@@ -126,14 +157,17 @@ module.exports = function (io) {
         return;
       }
 
+      shuffleArray(names);
+
       io.emit('startVoting', answersObject, names);
       stopwatch.reset(15000); // reset to two minutes
       stopwatch.start();
       return;
     }
 
-    if (state == "voting") {
-      state = "calculating";
+    if (state == 'User Voting') {
+      state = 'calculating';
+      io.emit('updateState', state);
       io.emit('endVoting');
       // Show a loading... screen until the votes are tallied
       return;
@@ -141,9 +175,15 @@ module.exports = function (io) {
   });
 
   function startRound(questionText) {
-    state = "answering";
-
-    // Start answering the question
+    for (var val in people) {
+      if (people[val].isPlaying === true) {
+        players.push(val);
+      }
+    }
+    
+    state = "User Answers";
+    io.emit('updateState', state);
+    // Start User Answers the question
     question = questionText;
     io.emit('startQuestion', question);
     stopwatch.reset(10000); // reset stopwatch to one minute
@@ -164,8 +204,9 @@ module.exports = function (io) {
     }
     // emit to all users a resetRound event (reset clock, hide questions, answers, and their answers)
     io.emit('resetRound', text);
-    // Change state back to pregame
-    state = 'pregame';
+    // Change state back to Pregame
+    state = 'Pregame';
+    io.emit('updateState', state);
     // emit a different event to the host??? Or check client side
     stopwatch.pause();
   }
@@ -192,7 +233,7 @@ module.exports = function (io) {
       scoreArray.push({"name": people[person].name, "score": people[person].score});
     }
 
-    state = "pregame";
+    state = 'Pregame';
     for (var prop in answers) {
       if (answers.hasOwnProperty(prop)) {
         delete answers[prop];
@@ -205,8 +246,10 @@ module.exports = function (io) {
     }
 
     scoreArray.sort(function(a, b){return b.score-a.score});
-    console.log(scoreArray);
+    round = round + 1;
+    io.emit('updateRound', round);
     io.emit('roundOver', scoreArray); // will send an array back to the clients of the names and scores in sorted order
+    io.emit('updateState', state);
   }
 };
 
@@ -218,4 +261,18 @@ function makeid() {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return text;
+}
+
+/**
+ * Randomize array element order in-place.
+ * Using Durstenfeld shuffle algorithm.
+ */
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
 }

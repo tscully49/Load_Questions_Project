@@ -4,20 +4,19 @@ block content
   .container#app-wrapper
     .row
       .col-xs-12#game-wrapper
-        h3#host-banner You are the host
+        #host-banner-wrapper
         #header-wrapper
           h1
             u= title
         //p Welcome to #{title}
-        #timer-buttons.group
-          #buttons-wrapper
-            h3 Master Controls
-            button#start-round.btn.btn-success Click to start round
-            button#resume-timer.btn.btn-success.hidden Resume Timer
-            button#pause-timer.btn.btn-warning.hidden Pause Timer
-            button#reset-timer.btn.btn-info.hidden Reset Timer?
-          #end-round-wrapper
-            button#end-round.btn.btn-danger.hidden End Round
+        #round
+          #number-wrapper
+            h1 Round: 
+            h1#number
+          #stage
+            h2 Stage:
+            h4#phase
+        #timer-buttons.group.hidden
         #timer-wrapper
           #timer
         #server-disconnect

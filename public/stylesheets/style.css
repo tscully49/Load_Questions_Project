@@ -16,6 +16,7 @@ a {
 	border: solid black 1px;
 	margin-top: -1px;
 	margin-bottom: 1em;
+  clear: both;
 }
 
 #timer {
@@ -117,7 +118,7 @@ a {
   border: solid 1px #878787;
   color: white;
   background-color: #9F9F9F;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
 }
 
 #header-wrapper h1 {
@@ -202,4 +203,36 @@ select option[disabled]:first-child {
 
 #current-score {
   border: solid black 1px;
+}
+
+#round {
+  text-align: center
+}
+
+#number {
+  margin-left: 0.25em;
+}
+
+#number-wrapper {
+  display: inline-block;
+  float: left;
+}
+
+#number-wrapper > h1 {
+  margin-top: 0em;
+  display: inline-block;
+}
+
+#stage {
+  float: right;
+}
+
+#stage > h4, #stage > h2 {
+  display: inline-block;
+  margin-left: 0.5em;
+  margin-top: 0.25em;
+}
+
+#stage > h4 {
+  font-size: 20px;
 }

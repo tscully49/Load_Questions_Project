@@ -2,9 +2,7 @@ var socket;
 var isHost = false;
 
 $(document).ready(function() {
-	socket = io(); // window.location.hostname
-  $('#timer-buttons').hide();
-  $('#host-banner').hide();
+	socket = io();
   // DO THIS ON A CONNECTION $('#server-disconnect').remove();
 
   ///////////////////////////////////////////////////////////////////
@@ -15,11 +13,27 @@ $(document).ready(function() {
 		$('#timer').html(data.countdown);
 	});
 
-  socket.on('isHost', function() {
-    $('#timer-buttons').show();
-    $('#host-banner').show();
+  socket.on('isHost', function(hostButtons, hostBanner) {
+    $('#timer-buttons').empty().append(hostButtons).removeClass('hidden');
+    $('#host-banner-wrapper').empty().append(hostBanner);
+    $('#server-disconnect').empty();
     isHost = true;
-  })
+  });
+
+  socket.on('isNotHost', function() {
+    $('#timer-buttons').empty().addClass('hidden');
+    $('#host-banner').remove();
+    $('#server-disconnect').empty();
+    isHost = false;
+  });
+
+  socket.on('updateRound', function(number){
+    $('#number').empty().append(number);
+  });
+
+  socket.on('updateState', function(state) {
+    $('#phase').empty().append(state);
+  });
 
 	socket.on('startQuestion', function(question) {
     $('#alert-end-round').remove();
@@ -89,7 +103,7 @@ $(document).ready(function() {
   //// START Button event listeners that will emit to sockets ///////////////////
   /////////////////////////////////////////////////////////////////
 
-	$('#start-round').click(function() {
+	$(document).on('click', '#start-round', function() {
 		socket.emit('startRound');
     $(event.target).addClass('hidden');
     $('#resume-timer').removeClass('hidden').prop('disabled', true);
@@ -98,24 +112,24 @@ $(document).ready(function() {
     $('#reset-timer').removeClass('hidden');
 	});
 
-	$('#pause-timer').click(function() {
+	$(document).on('click', '#pause-timer', function() {
     $(event.target).prop('disabled', true);
     $('#resume-timer').prop('disabled', '');
 		socket.emit('pauseTimer');
 	});
 
-  $('#resume-timer').click(function() {
+  $(document).on('click', '#resume-timer', function() {
     $(event.target).prop('disabled', true);
     $('#pause-timer').prop('disabled', '');
     socket.emit('resumeTimer');
   });
 
-	$('#reset-timer').click(function() {
+	$(document).on('click', '#reset-timer', function() {
     var seconds = 60000;
 		socket.emit('resetTimer', 60000);
 	});
 
-  $('#end-round').click(function() {
+  $(document).on('click', '#end-round', function() {
     var prompt = "Are you sure?"
         buttons = "<div id='cancel-buttons'><p class='confirm-prompt'><b>Are you sure?</b></p><button id='no-cancel' class='btn btn-default'>no</button><button id='yes-cancel' class='btn btn-default'>yes</button></div>";
 
@@ -198,6 +212,5 @@ function showScores(array) {
   });
 
   returnString = returnString + "</tbody></table></div>";
-  console.log(returnString);
   return returnString;
 }
