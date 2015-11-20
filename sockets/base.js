@@ -7,6 +7,8 @@ var personCount = 0;
 var state = 'pregame'; // Options: pregame, answering, bufferTime, voting, calculating, endgame
 // Make a status variable that will not allow people to join the game AFTER answers are submitted or if people haven't answered a question
 
+
+// Mongo Client information
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var collectionName = 'demo';
@@ -14,23 +16,24 @@ var mongo = function(db, callback) {
         MongoClient.connect('mongodb://loadedquestionsdb.cloudapp.net:27017/' + db, callback);
 };
 
+// Gets the start round function as a callback function then once the question text has been received it calls the start round with the response to populate the question
 function queryData(startRound){
   mongo('demo', function(err, db) {
-  				if (err){
+// if there is an error log the error and display error message as question.
+					if (err){
   					 console.log("Connection Error", err);
-  					 return "Database connection error.";
+  					 startRound("Database connection error.");
   				 }
 
   				var collection = db.collection('questions');
-
+// Run the query then with the response from the database call the start round
   				var query = {};
   				collection.find(query).toArray(function(err, items) {
-  								if (err) respond(res, {"Query Error": err});
+  								if (err) startRound("Query Error: ", err);
   								var index = Math.floor(Math.random() * 25);
   								var question = items[index];
   								db.close();
 									var questionText = question.questionText;
-									console.log(JSON.stringify(questionText));
   								startRound(questionText);
   				});
   });
@@ -117,7 +120,7 @@ module.exports = function (io) {
         names[key] = answers[key].name;
         answersObject[answers[key].name_id] = answers[key].answer;
       }
-      console.log(answersObject); 
+      console.log(answersObject);
 
       io.emit('startVoting', answersObject, names);
       stopwatch.reset(5000); // reset to two minutes
