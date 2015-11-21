@@ -21,3 +21,6 @@
 4. A question will be asked, people will have a set time to answer (if they don't answer, they do not participate in the voting)
 5. After time is up, a new timer starts where people will make guesses on who answered what question
 6. At end of time, the answers will be shown, and points awarded accordingly, host will then choose when to start next round 
+
+##URL:
+http://loadedquestionsproject.cloudapp.net:3000/
